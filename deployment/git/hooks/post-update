@@ -1,0 +1,21 @@
+#!/bin/sh
+
+LOG_DIR=~/avvalmarket.ir.git/logs
+[ ! -d "$LOG_DIR" ] && mkdir LOG_DIR
+LOG_FILE="$LOG_DIR/deployment-update-hook.log"
+
+echo "\n\n ===== [$(date)] ==== \n\n" >> $LOG_FILE
+echo "[$(date)] got new push" >> $LOG_FILE
+# to have git compiled from source
+source /etc/bashrc
+work_tree=/root/avvalmarket.ir
+GIT_WORK_TREE=$work_tree git checkout develop -f
+export NVM_DIR="/root/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+nvm use v0.10.31
+cd $work_tree
+# ./bower-admin install --allow-root
+# ./bower-marketing install --allow-root
+# npm install 
+grunt build --force # | tee -a $LOG_FILE
+forever restart 0 # | tee -a $LOG_FILE
